@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CryptoTrader Bot</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="img/favicon.png">
+</head>
+<body>
+    <!-- Language Selector -->
+    <div class="language-selector">
+        <button class="btn btn-sm" data-lang="pt"><img src="img/flag-pt.png" alt="Português" class="flag-icon"> PT</button>
+        <button class="btn btn-sm" data-lang="en"><img src="img/flag-en.png" alt="English" class="flag-icon"> EN</button>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <nav class="navbar navbar-expand-lg">
+            <div class="container">
+                <a class="navbar-brand" href="#">
+                    <img src="img/logo.png" alt="CryptoTrader Bot" class="logo">
+                    <span class="logo-text">CryptoTrader Bot</span>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#dashboard" data-i18n="nav.dashboard">Dashboard</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#market" data-i18n="nav.market">Mercado</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#signals" data-i18n="nav.signals">Sinais</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#trades" data-i18n="nav.trades">Operações</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#settings" data-i18n="nav.settings">Configurações</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Dashboard Section -->
+        <section id="dashboard" class="section active">
+            <div class="container">
+                <h1 class="section-title" data-i18n="dashboard.title">Dashboard</h1>
+                
+                <!-- Status Cards -->
+                <div class="row status-cards">
+                    <div class="col-md-3 col-sm-6">
+                        <div class="card status-card">
+                            <div class="card-body">
+                                <h5 class="card-title" data-i18n="dashboard.status">Status</h5>
+                                <div class="status-indicator online">
+                                    <span class="status-dot"></span>
+                                    <span class="status-text" data-i18n="dashboard.online">Online</span>
+                                </div>
+                                <p class="card-text" data-i18n="dashboard.uptime">Tempo ativo: <span id="uptime">3d 12h 45m</span></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-6">
+                        <div class="card status-card">
+                            <div class="card-body">
+                                <h5 class="card-title" data-i18n="dashboard.todayTrades">Operações Hoje</h5>
+                                <div class="status-value" id="trades-today">12</div>
+                                <p class="card-text" data-i18n="dashboard.activePairs">Pares ativos: <span id="active-pairs">5</span></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-6">
+                        <div class="card status-card">
+                            <div class="card-body">
+                                <h5 class="card-title" data-i18n="dashboard.todayProfit">Lucro Hoje</h5>
+                                <div class="status-value profit" id="profit-today">+$15.28</div>
+                                <p class="card-text" data-i18n="dashboard.profitPercent">Percentual: <span id="profit-percent">+2.3%</span></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-6">
+                        <div class="card status-card">
+                            <div class="card-body">
+                                <h5 class="card-title" data-i18n="dashboard.totalProfit">Lucro Total</h5>
+                                <div class="status-value profit" id="total-profit">+$342.76</div>
+                                <p class="card-text" data-i18n="dashboard.since">Desde: <span id="since-date">01/05/2025</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Price Chart -->
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="card chart-card">
+                            <div class="card-header">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="card-title mb-0" data-i18n="dashboard.priceChart">Gráfico de Preços</h5>
+                                    <div class="chart-controls">
+                                        <select id="chart-symbol" class="form-select form-select-sm">
+                                            <option value="BTC">Bitcoin (BTC)</option>
+                                            <option value="ETH">Ethereum (ETH)</option>
+                                            <option value="BNB">Binance Coin (BNB)</option>
+                                            <option value="XRP">Ripple (XRP)</option>
+                                            <option value="ADA">Cardano (ADA)</option>
+                                        </select>
+                                        <div class="btn-group" role="group">
+                                            <button type="button" class="btn btn-sm btn-outline-secondary active" data-timeframe="1d">1D</button>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" data-timeframe="1w">1S</button>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" data-timeframe="1m">1M</button>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" data-timeframe="3m">3M</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div id="price-chart" class="chart-container"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0" data-i18n="dashboard.latestSignals">Últimos Sinais</h5>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="latest-signals" id="latest-signals">
+                                    <!-- Signals will be loaded here -->
+                                    <div class="signal-item buy">
+                                        <div class="signal-icon">
+                                            <i class="bi bi-arrow-up-circle-fill"></i>
+                                        </div>
+                                        <div class="signal-info">
+                                            <div class="signal-title">BTC/USDT <span class="signal-type">COMPRA</span></div>
+                                            <div class="signal-details">
+                                                <span class="signal-time">Hoje, 14:25</span>
+                                                <span class="signal-price">$51,245.30</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="signal-item sell">
+                                        <div class="signal-icon">
+                                            <i class="bi bi-arrow-down-circle-fill"></i>
+                                        </div>
+                                        <div class="signal-info">
+                                            <div class="signal-title">ETH/USDT <span class="signal-type">VENDA</span></div>
+                                            <div class="signal-details">
+                                                <span class="signal-time">Hoje, 12:10</span>
+                                                <span class="signal-price">$3,120.45</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="signal-item buy">
+                                        <div class="signal-icon">
+                                            <i class="bi bi-arrow-up-circle-fill"></i>
+                                        </div>
+                                        <div class="signal-info">
+                                            <div class="signal-title">ADA/USDT <span class="signal-type">COMPRA</span></div>
+                                            <div class="signal-details">
+                                                <span class="signal-time">Ontem, 18:35</span>
+                                                <span class="signal-price">$1.24</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-footer text-center">
+                                <a href="#signals" class="btn btn-sm btn-outline-primary" data-i18n="dashboard.viewAllSignals">Ver Todos os Sinais</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Recent Trades -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0" data-i18n="dashboard.recentTrades">Operações Recentes</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th data-i18n="trades.date">Data</th>
+                                                <th data-i18n="trades.pair">Par</th>
+                                                <th data-i18n="trades.type">Tipo</th>
+                                                <th data-i18n="trades.price">Preço</th>
+                                                <th data-i18n="trades.amount">Quantidade</th>
+                                                <th data-i18n="trades.total">Total</th>
+                                                <th data-i18n="trades.profitLoss">Lucro/Perda</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="recent-trades">
+                                            <!-- Trades will be loaded here -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="card-footer text-center">
+                                <a href="#trades" class="btn btn-sm btn-outline-primary" data-i18n="dashboard.viewAllTrades">Ver Todas as Operações</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Market Section -->
+        <section id="market" class="section">
+            <div class="container">
+                <h1 class="section-title" data-i18n="market.title">Mercado</h1>
+                
+                <!-- Market Overview -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="card-title mb-0" data-i18n="market.overview">Visão Geral do Mercado</h5>
+                                    <div class="search-box">
+                                        <input type="text" class="form-control form-control-sm" id="market-search" placeholder="Buscar moeda..." data-i18n-placeholder="market.searchCoin">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-hover market-table">
+                                        <thead>
+                                            <tr>
+                                                <th data-i18n="market.coin">Moeda</th>
+                                                <th data-i18n="market.price">Preço</th>
+                                                <th data-i18n="market.change24h">Variação 24h</th>
+                                                <th data-i18n="market.volume24h">Volume 24h</th>
+                                                <th data-i18n="market.marketCap">Cap. de Mercado</th>
+                                                <th data-i18n="market.action">Ação</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="market-data">
+                                            <!-- Market data will be loaded here -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Detailed Analysis -->
+                <div class="row mt-4">
+                    <div class="col-lg-8">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="card-title mb-0" data-i18n="market.detailedChart">Gráfico Detalhado</h5>
+                                    <div class="chart-controls">
+                                        <select id="detail-chart-symbol" class="form-select form-select-sm">
+                                            <option value="BTC">Bitcoin (BTC)</option>
+                                            <option value="ETH">Ethereum (ETH)</option>
+                                            <option value="BNB">Binance Coin (BNB)</option>
+                                            <option value="XRP">Ripple (XRP)</option>
+                                            <option value="ADA">Cardano (ADA)</option>
+                                        </select>
+                                        <div class="btn-group" role="group">
+                                            <button type="button" class="btn btn-sm btn-outline-secondary active" data-timeframe="1d">1D</button>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" data-timeframe="1w">1S</button>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" data-timeframe="1m">1M</button>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" data-timeframe="3m">3M</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div id="detail-chart" class="chart-container"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0" data-i18n="market.technicalAnalysis">Análise Técnica</h5>
+                            </div>
+                            <div class="card-body" id="technical-analysis">
+                                <!-- Technical analysis will be loaded here -->
+                                <div class="analysis-header">
+                                    <h3 class="coin-name">Bitcoin (BTC)</h3>
+                                    <div class="recommendation buy">COMPRA</div>
+                                </div>
+                                
+                                <div class="indicator-group">
+                                    <h6 data-i18n="market.oscillators">Osciladores</h6>
+                                    <div class="indicator">
+                                        <span class="indicator-name">RSI (14)</span>
+                                        <div class="indicator-value">48.5</div>
+                                        <span class="indicator-status neutral">Neutro</span>
+                                    </div>
+                                    <div class="indicator">
+                                        <span class="indicator-name">MACD</span>
+                                        <div class="indicator-value">0.82</div>
+                                        <span class="indicator-status buy">Compra</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="indicator-group">
+                                    <h6 data-i18n="market.movingAverages">Médias Móveis</h6>
+                                    <div class="indicator">
+                                        <span class="indicator-name">MA (20)</span>
+                                        <div class="indicator-value">50,245.30</div>
+                                        <span class="indicator-status buy">Compra</span>
+                                    </div>
+                                    <div class="indicator">
+                                        <span class="indicator-name">MA (50)</span>
+                                        <div class="indicator-value">49,120.45</div>
+                                        <span class="indicator-status buy">Compra</span>
+                                    </div>
+                                    <div class="indicator">
+                                        <span class="indicator-name">MA (200)</span>
+                                        <div class="indicator-value">48,350.75</div>
+                                        <span class="indicator-status buy">Compra</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="indicator-group">
+                                    <h6 data-i18n="market.trend">Tendência</h6>
+                                    <div class="trend-indicator bullish">
+                                        <i class="bi bi-arrow-up-right"></i>
+                                        <span data-i18n="market.bullish">Altista</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Signals Section -->
+        <section id="signals" class="section">
+            <div class="container">
+                <h1 class="section-title" data-i18n="signals.title">Sinais de Trading</h1>
+                
+                <!-- Signals Filter -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0" data-i18n="signals.filter">Filtrar Sinais</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="mb-3">
+                                            <label for="signal-coin" class="form-label" data-i18n="signals.coin">Moeda</label>
+                                            <select id="signal-coin" class="form-select">
+                                                <option value="all" data-i18n="signals.allCoins">Todas as Moedas</option>
+                                                <option value="BTC">Bitcoin (BTC)</option>
+                                                <option value="ETH">Ethereum (ETH)</option>
+                                                <option value="BNB">Binance Coin (BNB)</option>
+                                                <option value="XRP">Ripple (XRP)</option>
+                                                <option value="ADA">Cardano (ADA)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="mb-3">
+                                            <label for="signal-type" class="form-label" data-i18n="signals.type">Tipo</label>
+                                            <select id="signal-type" class="form-select">
+                                                <option value="all" data-i18n="signals.allTypes">Todos os Tipos</option>
+                                                <option value="buy" data-i18n="signals.buy">Compra</option>
+                                                <option value="sell" data-i18n="signals.sell">Venda</option>
+                                                <option value="strong_buy" data-i18n="signals.strongBuy">Compra Forte</option>
+                                                <option value="strong_sell" data-i18n="signals.strongSell">Venda Forte</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="mb-3">
+                                            <label for="signal-date" class="form-label" data-i18n="signals.date">Data</label>
+                                            <select id="signal-date" class="form-select">
+                                                <option value="all" data-i18n="signals.allDates">Todas as Datas</option>
+                                                <option value="today" data-i18n="signals.today">Hoje</option>
+                                                <option value="yesterday" data-i18n="signals.yesterday">Ontem</option>
+                                                <option value="week" data-i18n="signals.thisWeek">Esta Semana</option>
+                                                <option value="month" data-i18n="signals.thisMonth">Este Mês</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="mb-3">
+                                            <label for="signal-confidence" class="form-label" data-i18n="signals.confidence">Confiança</label>
+                                            <select id="signal-confidence" class="form-select">
+                                                <option value="all" data-i18n="signals.allLevels">Todos os Níveis</option>
+                                                <option value="high" data-i18n="signals.high">Alta (>80%)</option>
+                                                <option value="medium" data-i18n="signals.medium">Média (60-80%)</option>
+                                                <option value="low" data-i18n="signals.low">Baixa (<60%)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Signals List -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0" data-i18n="signals.list">Lista de Sinais</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="signals-container" id="signals-list">
+                                    <!-- Signals will be loaded here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Trades Section -->
+        <section id="trades" class="section">
+            <div class="container">
+                <h1 class="section-title" data-i18n="trades.title">Histórico de Operações</h1>
+                
+                <!-- Trades Filter -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0" data-i18n="trades.filter">Filtrar Operações</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="mb-3">
+                                            <label for="trade-coin" class="form-label" data-i18n="trades.coin">Moeda</label>
+                                            <select id="trade-coin" class="form-select">
+                                                <option value="all" data-i18n="trades.allCoins">Todas as Moedas</option>
+                                                <option value="BTC">Bitcoin (BTC)</option>
+                                                <option value="ETH">Ethereum (ETH)</option>
+                                                <option value="BNB">Binance Coin (BNB)</option>
+                                                <option value="XRP">Ripple (XRP)</option>
+                                                <option value="ADA">Cardano (ADA)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="mb-3">
+                                            <label for="trade-type" class="form-label" data-i18n="trades.type">Tipo</label>
+                                            <select id="trade-type" class="form-select">
+                                                <option value="all" data-i18n="trades.allTypes">Todos os Tipos</option>
+                                                <option value="buy" data-i18n="trades.buy">Compra</option>
+                                                <option value="sell" data-i18n="trades.sell">Venda</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="mb-3">
+                                            <label for="trade-date" class="form-label" data-i18n="trades.dateRange">Período</label>
+                                            <select id="trade-date" class="form-select">
+                                                <option value="all" data-i18n="trades.allDates">Todas as Datas</option>
+                                                <option value="today" data-i18n="trades.today">Hoje</option>
+                                                <option value="yesterday" data-i18n="trades.yesterday">Ontem</option>
+                                                <option value="week" data-i18n="trades.thisWeek">Esta Semana</option>
+                                                <option value="month" data-i18n="trades.thisMonth">Este Mês</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="mb-3">
+                                            <label for="trade-result" class="form-label" data-i18n="trades.result">Resultado</label>
+                                            <select id="trade-result" class="form-select">
+                                                <option value="all" data-i18n="trades.allResults">Todos os Resultados</option>
+                                                <option value="profit" data-i18n="trades.profit">Lucro</option>
+                                                <option value="loss" data-i18n="trades.loss">Perda</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Trades Table -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="card-title mb-0" data-i18n="trades.history">Histórico de Operações</h5>
+                                    <div class="trades-summary">
+                                        <span class="trades-count" data-i18n="trades.totalTrades">Total: <span id="total-trades">0</span></span>
+                                        <span class="trades-profit" data-i18n="trades.netProfit">Lucro Líquido: <span id="net-profit">$0.00</span></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th data-i18n="trades.date">Data</th>
+                                                <th data-i18n="trades.pair">Par</th>
+                                                <th data-i18n="trades.type">Tipo</th>
+                                                <th data-i18n="trades.price">Preço</th>
+                                                <th data-i18n="trades.amount">Quantidade</th>
+                                                <th data-i18n="trades.total">Total</th>
+                                                <th data-i18n="trades.profitLoss">Lucro/Perda</th>
+                                                <th data-i18n="trades.status">Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="trades-history">
+                                            <!-- Trades will be loaded here -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Settings Section -->
+        <section id="settings" class="section">
+            <div class="container">
+                <h1 class="section-title" data-i18n="settings.title">Configurações</h1>
+                
+                <!-- Bot Settings -->
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0" data-i18n="settings.botSettings">Configurações do Bot</h5>
+                            </div>
+                            <div class="card-body">
+                                <form id="bot-settings-form">
+                                    <div class="mb-3">
+                                        <label for="risk-profile" class="form-label" data-i18n="settings.riskProfile">Perfil de Risco</label>
+                                        <select id="risk-profile" class="form-select">
+                                            <option value="conservative" data-i18n="settings.conservative">Conservador</option>
+                                            <option value="moderate" selected data-i18n="settings.moderate">Moderado</option>
+                                            <option value="aggressive" data-i18n="settings.aggressive">Agressivo</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="trading-pairs" class="form-label" data-i18n="settings.tradingPairs">Pares de Trading</label>
+                                        <select id="trading-pairs" class="form-select" multiple>
+                                            <option value="BTC" selected>Bitcoin (BTC)</option>
+                                            <option value="ETH" selected>Ethereum (ETH)</option>
+                                            <option value="BNB" selected>Binance Coin (BNB)</option>
+                                            <option value="XRP" selected>Ripple (XRP)</option>
+                                            <option value="ADA" selected>Cardano (ADA)</option>
+                                            <option value="SOL">Solana (SOL)</option>
+                                            <option value="DOT">Polkadot (DOT)</option>
+                                            <option value="DOGE">Dogecoin (DOGE)</option>
+                                        </select>
+                                        <div class="form-text" data-i18n="settings.pairsHelp">Selecione múltiplos pares segurando Ctrl/Cmd</div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="capital-per-trade" class="form-label" data-i18n="settings.capitalPerTrade">Capital por Operação (USD)</label>
+                                        <input type="number" class="form-control" id="capital-per-trade" value="10" min="1" max="100">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="max-open-trades" class="form-label" data-i18n="settings.maxOpenTrades">Máximo de Operações Abertas</label>
+                                        <input type="number" class="form-control" id="max-open-trades" value="5" min="1" max="20">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="trading-timeframe" class="form-label" data-i18n="settings.tradingTimeframe">Timeframe de Trading</label>
+                                        <select id="trading-timeframe" class="form-select">
+                                            <option value="1m" data-i18n="settings.1m">1 minuto</option>
+                                            <option value="5m" data-i18n="settings.5m">5 minutos</option>
+                                            <option value="15m" data-i18n="settings.15m">15 minutos</option>
+                                            <option value="30m" data-i18n="settings.30m">30 minutos</option>
+                                            <option value="1h" selected data-i18n="settings.1h">1 hora</option>
+                                            <option value="4h" data-i18n="settings.4h">4 horas</option>
+                                            <option value="1d" data-i18n="settings.1d">1 dia</option>
+                                        </select>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary" data-i18n="settings.saveSettings">Salvar Configurações</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0" data-i18n="settings.indicators">Configurações de Indicadores</h5>
+                            </div>
+                            <div class="card-body">
+                                <form id="indicators-settings-form">
+                                    <div class="mb-3">
+                                        <label class="form-label" data-i18n="settings.rsi">RSI</label>
+                                        <div class="row">
+                                            <div class="col">
+                                                <label for="rsi-period" class="form-label" data-i18n="settings.period">Período</label>
+                                                <input type="number" class="form-control" id="rsi-period" value="14" min="1" max="50">
+                                            </div>
+                                            <div class="col">
+                                                <label for="rsi-overbought" class="form-label" data-i18n="settings.overbought">Sobrecomprado</label>
+                                                <input type="number" class="form-control" id="rsi-overbought" value="70" min="50" max="90">
+                                            </div>
+                                            <div class="col">
+                                                <label for="rsi-oversold" class="form-label" data-i18n="settings.oversold">Sobrevendido</label>
+                                                <input type="number" class="form-control" id="rsi-oversold" value="30" min="10" max="50">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label" data-i18n="settings.macd">MACD</label>
+                                        <div class="row">
+                                            <div class="col">
+                                                <label for="macd-fast" class="form-label" data-i18n="settings.fastPeriod">Período Rápido</label>
+                                                <input type="number" class="form-control" id="macd-fast" value="12" min="1" max="50">
+                                            </div>
+                                            <div class="col">
+                                                <label for="macd-slow" class="form-label" data-i18n="settings.slowPeriod">Período Lento</label>
+                                                <input type="number" class="form-control" id="macd-slow" value="26" min="1" max="100">
+                                            </div>
+                                            <div class="col">
+                                                <label for="macd-signal" class="form-label" data-i18n="settings.signalPeriod">Período de Sinal</label>
+                                                <input type="number" class="form-control" id="macd-signal" value="9" min="1" max="50">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label" data-i18n="settings.bollingerBands">Bandas de Bollinger</label>
+                                        <div class="row">
+                                            <div class="col">
+                                                <label for="bb-period" class="form-label" data-i18n="settings.period">Período</label>
+                                                <input type="number" class="form-control" id="bb-period" value="20" min="1" max="50">
+                                            </div>
+                                            <div class="col">
+                                                <label for="bb-deviation" class="form-label" data-i18n="settings.deviation">Desvio</label>
+                                                <input type="number" class="form-control" id="bb-deviation" value="2" min="1" max="5" step="0.1">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label" data-i18n="settings.movingAverages">Médias Móveis</label>
+                                        <div class="row">
+                                            <div class="col">
+                                                <label for="ma-fast" class="form-label" data-i18n="settings.fastMA">MA Rápida</label>
+                                                <input type="number" class="form-control" id="ma-fast" value="20" min="1" max="100">
+                                            </div>
+                                            <div class="col">
+                                                <label for="ma-slow" class="form-label" data-i18n="settings.slowMA">MA Lenta</label>
+                                                <input type="number" class="form-control" id="ma-slow" value="50" min="1" max="200">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary" data-i18n="settings.saveIndicators">Salvar Indicadores</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- App Settings -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0" data-i18n="settings.appSettings">Configurações da Aplicação</h5>
+                            </div>
+                            <div class="card-body">
+                                <form id="app-settings-form">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="app-language" class="form-label" data-i18n="settings.language">Idioma</label>
+                                                <select id="app-language" class="form-select">
+                                                    <option value="pt" selected data-i18n="settings.portuguese">Português</option>
+                                                    <option value="en" data-i18n="settings.english">English</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="app-theme" class="form-label" data-i18n="settings.theme">Tema</label>
+                                                <select id="app-theme" class="form-select">
+                                                    <option value="light" data-i18n="settings.light">Claro</option>
+                                                    <option value="dark" selected data-i18n="settings.dark">Escuro</option>
+                                                    <option value="auto" data-i18n="settings.auto">Automático</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="refresh-interval" class="form-label" data-i18n="settings.refreshInterval">Intervalo de Atualização (segundos)</label>
+                                                <input type="number" class="form-control" id="refresh-interval" value="30" min="5" max="300">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="chart-style" class="form-label" data-i18n="settings.chartStyle">Estilo de Gráfico</label>
+                                                <select id="chart-style" class="form-select">
+                                                    <option value="candles" selected data-i18n="settings.candlestick">Candlestick</option>
+                                                    <option value="line" data-i18n="settings.line">Linha</option>
+                                                    <option value="area" data-i18n="settings.area">Área</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-check mb-3">
+                                        <input class="form-check-input" type="checkbox" id="enable-notifications" checked>
+                                        <label class="form-check-label" for="enable-notifications" data-i18n="settings.enableNotifications">
+                                            Habilitar notificações no navegador
+                                        </label>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary" data-i18n="settings.saveAppSettings">Salvar Configurações da Aplicação</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="mb-0" data-i18n="footer.copyright">© 2025 CryptoTrader Bot. Todos os direitos reservados.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="mb-0" data-i18n="footer.version">Versão 1.0.0</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/luxon@3.0.1/build/global/luxon.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1.0.0/dist/chartjs-adapter-luxon.min.js"></script>
+    <script src="js/i18n.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/charts.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
